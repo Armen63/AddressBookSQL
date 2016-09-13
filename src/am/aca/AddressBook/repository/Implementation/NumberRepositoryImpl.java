@@ -46,9 +46,9 @@ public class NumberRepositoryImpl implements NumberRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
         }
     }
 }

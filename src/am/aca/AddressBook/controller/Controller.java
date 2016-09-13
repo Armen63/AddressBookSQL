@@ -43,13 +43,13 @@ public class Controller {
 
         printMessage("begin");
         comman = input.nextLine();
- /*       while (true){*/
-            switch (comman){
+        while (true) {
+            switch (comman) {
                 case "1":
                     signUp();
                     break;
                 case "2":
-                    signIn(null,null);
+                    signIn(null, null);
                     break;
                 case "3":
                     addTelNumber();
@@ -91,7 +91,7 @@ public class Controller {
             }
             comman = input.nextLine();
         }
-
+    }
     private void changeUserInfo() throws MyException, SQLException {
         UserRepositoryImpl userimpl = new UserRepositoryImpl();
         printMessage("writeID");
@@ -114,18 +114,21 @@ public class Controller {
         User user = new User(username,password);
         user.setUserName(username);
         user.setPassword(password);
-
+        Connection connection = null;
+        Statement statement = null;
         try{
-            Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-            Statement st = (Statement) connection.createStatement();
+             connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+             statement = (Statement) connection.createStatement();
 
             String line ="insert into user " + "(username,password)"+
                     "values ( '"+username+"','"+password+"')" ;
-            st.executeUpdate(line);
-            connection.close();
-            st.close();
+            statement.executeUpdate(line);
         } catch (SQLException e1) {
             e1.printStackTrace();
+        }
+        finally {
+            statement.close();
+            connection.close();
         }
         printMessage("successfullyCreate");
         comman = input.nextLine();
@@ -172,6 +175,8 @@ public class Controller {
                 printMessage("help");
             else if (input.nextLine().equals("Sign Out"))
                 System.exit(404);
+            else if (input.nextLine().equals("Start"))
+                executor();
         } else
             System.exit(444);
     }
@@ -188,64 +193,80 @@ public class Controller {
 
         if(number.startsWith("374 10")){
             telNumber.setTypeNumber(HOME);
+            Connection connection = null;
+            Statement statement = null;
             try{
-                Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-                Statement st = (Statement) connection.createStatement();
+                 connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+                 statement = (Statement) connection.createStatement();
 
                 String line ="insert into telnumber " + "(HomeNumber,MobileNumber)"+
                         "values ( '"+number+"', '"+null+"')" ;
-                st.executeUpdate(line);
-                connection.close();
-                st.close();
+                statement.executeUpdate(line);
             } catch (SQLException e1) {
                 e1.printStackTrace();
+            }
+            finally {
+                statement.close();
+                connection.close();
             }
         }
         else{
             telNumber.setTypeNumber(MOBILE);
+            Connection connection = null;
+            Statement statement = null;
             try{
-                Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-                Statement st = (Statement) connection.createStatement();
+                connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+                statement = (Statement) connection.createStatement();
 
                 String line ="insert into telnumber " + "(HomeNumber,MobileNumber)"+
                         "values ( '"+null+"', '"+number+"')" ;
-                st.executeUpdate(line);
-                connection.close();
-                st.close();
+                statement.executeUpdate(line);
             } catch (SQLException e1) {
                 e1.printStackTrace();
+            }
+            finally {
+                statement.close();
+                connection.close();
             }
         }
         if(input.nextLine().equals("Add Tel"))
             addTelNumber();
         else if(input.nextLine().equals("Show Tel"))
             showTelNumbers();
+        else if (input.nextLine().equals("Start"))
+            executor();
         else
             System.exit(444);
 
     }
 
 
-    private void addFriend() {
+    private void addFriend() throws SQLException, MyException {
         Scanner input = new Scanner(System.in);
         String friendName;
         printMessage("writeFriendUsername");
         friendName = input.nextLine();
+        Connection connection = null;
+        Statement statement = null;
         try{
-            Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-            Statement st = (Statement) connection.createStatement();
+             connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+             statement = (Statement) connection.createStatement();
 
             String line ="insert into friendlist " + "(FriendName)"+
                     "values ( '"+friendName+"')" ;
-            st.executeUpdate(line);
-            connection.close();
-            st.close();
+            statement.executeUpdate(line);
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
+        finally {
+            statement.close();
+            connection.close();
+        }
         printMessage("addOrShow");
-        if(input.nextLine().equals("Add Friend"))
+        if(input.nextLine().equals("Add"))
             addFriend();
+        else if (input.nextLine().equals("Start"))
+            executor();
         else
             System.exit(4);
     }
@@ -275,9 +296,9 @@ public class Controller {
                 String friendName = resultSet.getString("FriendName");
                 System.out.println("id =[" + friendID + "]" +" FriendName =[" + friendName + "]");
             }
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
             System.exit(404);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -314,9 +335,9 @@ public class Controller {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
         }
     }
     private void deleteTelNumber() {
@@ -346,9 +367,10 @@ public class Controller {
                     System.out.println(" MobileName: [" + mobileNumber + "]");
 
                 }
-                connection.close();
-                statement.close();
                 resultSet.close();
+                statement.close();
+                connection.close();
+
                 System.exit(404);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -374,9 +396,9 @@ public class Controller {
                     System.out.println(" MobileName: [" + mobileNumber + "]");
 
                 }
-                connection.close();
-                statement.close();
                 resultSet.close();
+                statement.close();
+                connection.close();
                 System.exit(404);
             } catch (SQLException e) {
                 e.printStackTrace();

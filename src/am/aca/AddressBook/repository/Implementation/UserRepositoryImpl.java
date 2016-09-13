@@ -61,9 +61,9 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
         }
     }
 
@@ -84,9 +84,9 @@ public class UserRepositoryImpl implements UserRepository {
             e.printStackTrace();
         }
         finally{
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
         }
 
     }
@@ -111,9 +111,9 @@ public class UserRepositoryImpl implements UserRepository {
             e.printStackTrace();
         }
         finally {
-            connection.close();
-            statement.close();
             resultSet.close();
+            statement.close();
+            connection.close();
         }
     }
 
