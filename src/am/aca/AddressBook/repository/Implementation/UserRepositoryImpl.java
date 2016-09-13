@@ -45,12 +45,11 @@ public class UserRepositoryImpl implements UserRepository {
         username = input.nextLine();
         printMessage("writePassword");
         password = input.nextLine();
-        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-        Statement statement = (Statement) connection.createStatement();
 
         String update = ("UPDATE user SET Username = '" + username + "', Password = '" + password + "' where id =" + id);
         ResultSet resultSet = null;
-        try {
+        try( Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+             Statement statement = (Statement) connection.createStatement()) {
             resultSet = statement.executeQuery(update);
             while (resultSet.next()) {
                 int userID = resultSet.getInt("id");
@@ -62,8 +61,6 @@ public class UserRepositoryImpl implements UserRepository {
             e.printStackTrace();
         } finally {
             resultSet.close();
-            statement.close();
-            connection.close();
         }
     }
 

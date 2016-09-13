@@ -32,11 +32,10 @@ public class NumberRepositoryImpl implements NumberRepository {
 
     @Override
     public void getTelNumbers(Integer id) throws MyException, SQLException {
-        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-        Statement statement = (Statement) connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from addressbook.telnumber where id = " + id);
 
-        try {
+        try(  Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+              Statement statement = (Statement) connection.createStatement();
+              ResultSet resultSet = statement.executeQuery("select * from addressbook.telnumber where id = " + id)) {
             while (resultSet.next()) {
                 int telNumberId = resultSet.getInt("id");
                 String homeNumber = resultSet.getString("HomeNumber");
@@ -45,10 +44,7 @@ public class NumberRepositoryImpl implements NumberRepository {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            resultSet.close();
-            statement.close();
-            connection.close();
         }
     }
+
 }

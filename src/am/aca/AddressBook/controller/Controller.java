@@ -114,11 +114,9 @@ public class Controller {
         User user = new User(username,password);
         user.setUserName(username);
         user.setPassword(password);
-        Connection connection = null;
-        Statement statement = null;
-        try{
-             connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-             statement = (Statement) connection.createStatement();
+        try(Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+            Statement statement = (Statement) connection.createStatement();){
+
 
             String line ="insert into user " + "(username,password)"+
                     "values ( '"+username+"','"+password+"')" ;
@@ -126,10 +124,7 @@ public class Controller {
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        finally {
-            statement.close();
-            connection.close();
-        }
+
         printMessage("successfullyCreate");
         comman = input.nextLine();
         user.setId(generateId());
@@ -193,11 +188,10 @@ public class Controller {
 
         if(number.startsWith("374 10")){
             telNumber.setTypeNumber(HOME);
-            Connection connection = null;
-            Statement statement = null;
-            try{
-                 connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-                 statement = (Statement) connection.createStatement();
+            try(Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+                 Statement statement = (Statement) connection.createStatement();
+
+            ){
 
                 String line ="insert into telnumber " + "(HomeNumber,MobileNumber)"+
                         "values ( '"+number+"', '"+null+"')" ;
@@ -205,28 +199,16 @@ public class Controller {
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
-            finally {
-                statement.close();
-                connection.close();
-            }
         }
         else{
             telNumber.setTypeNumber(MOBILE);
-            Connection connection = null;
-            Statement statement = null;
-            try{
-                connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-                statement = (Statement) connection.createStatement();
-
+            try(Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+                Statement statement = (Statement) connection.createStatement();){
                 String line ="insert into telnumber " + "(HomeNumber,MobileNumber)"+
                         "values ( '"+null+"', '"+number+"')" ;
                 statement.executeUpdate(line);
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
-            finally {
-                statement.close();
-                connection.close();
             }
         }
         if(input.nextLine().equals("Add Tel"))
@@ -246,21 +228,15 @@ public class Controller {
         String friendName;
         printMessage("writeFriendUsername");
         friendName = input.nextLine();
-        Connection connection = null;
-        Statement statement = null;
-        try{
-             connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
-             statement = (Statement) connection.createStatement();
+        try(Connection connection =  DriverManager.getConnection(URL,PASSWORD,LOGIN);
+            Statement statement = (Statement) connection.createStatement();
+        ){
 
             String line ="insert into friendlist " + "(FriendName)"+
                     "values ( '"+friendName+"')" ;
             statement.executeUpdate(line);
         } catch (SQLException e1) {
             e1.printStackTrace();
-        }
-        finally {
-            statement.close();
-            connection.close();
         }
         printMessage("addOrShow");
         if(input.nextLine().equals("Add"))
@@ -287,10 +263,10 @@ public class Controller {
 
     private void showFriendList()throws MyException {
 
-        try {
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from addressbook.friendlist");
+        try( Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+             Statement statement = (Statement) connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("select * from addressbook.friendlist");
+        ) {
             while(resultSet.next()) {
                 int friendID = resultSet.getInt("id");
                 String friendName = resultSet.getString("FriendName");
@@ -312,10 +288,11 @@ public class Controller {
     }
 
     private void deleteFriend() throws SQLException {
-        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-        Statement statement = (Statement) connection.createStatement();
-        ResultSet resultSet = null;
-        try {
+
+        try( Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+             Statement statement = (Statement) connection.createStatement();
+        ) {
+
             Scanner input = new Scanner(System.in);
             String friendname;
             printMessage("deleteFriend");
@@ -323,21 +300,18 @@ public class Controller {
             String sql = "DELETE FROM addressbook.friendlist where FriendName = '" + friendname + "'";
             statement.executeUpdate(sql);
             sql = "select * from addressbook.friendlist";
+            ResultSet resultSet  = statement.executeQuery(sql);
             System.out.println("•••••••••After deleting•••••••••");
-            resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 int friendID = resultSet.getInt("id");
                 String friendName = resultSet.getString("FriendName");
                 System.out.print("ID: [" + friendID + "]");
                 System.out.println(" FriendName: [" + friendName + "]");
             }
+            resultSet.close();
             System.exit(404);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            resultSet.close();
-            statement.close();
-            connection.close();
         }
     }
     private void deleteTelNumber() {
@@ -345,12 +319,11 @@ public class Controller {
         Scanner input = new Scanner(System.in);
         String number = input.nextLine();
         if(number.equals("Home"))
-            try{
+            try(Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+                Statement statement = (Statement) connection.createStatement()){
                 String homeNumber;
                 printMessage("deleteHomeNumber");
                 homeNumber = input.nextLine();
-                Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-                Statement statement = (Statement) connection.createStatement();
                 String sql = "DELETE FROM addressbook.telnumber where HomeNumber = '" + homeNumber + "'" ;
                 statement.executeUpdate(sql);
                 sql = "select * from addressbook.telnumber";
@@ -368,19 +341,15 @@ public class Controller {
 
                 }
                 resultSet.close();
-                statement.close();
-                connection.close();
-
                 System.exit(404);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             else if(number.equals("Mobile"))
-            try{
+            try(  Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+                  Statement statement = (Statement) connection.createStatement()){
                 printMessage("deleteMobileNumber");
                 String mobileNumber = input.nextLine();
-                Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-                Statement statement = (Statement) connection.createStatement();
                 String sql = "DELETE FROM addressbook.telnumber where MobileNumber = '" + mobileNumber + "'" ;
                 statement.executeUpdate(sql);
                 sql = "select * from addressbook.telnumber";
@@ -397,8 +366,6 @@ public class Controller {
 
                 }
                 resultSet.close();
-                statement.close();
-                connection.close();
                 System.exit(404);
             } catch (SQLException e) {
                 e.printStackTrace();

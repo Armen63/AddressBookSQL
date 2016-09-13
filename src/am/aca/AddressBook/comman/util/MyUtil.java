@@ -9,7 +9,7 @@ import static java.lang.System.in;
  * Created by Armen on 9/10/2016.
  */
 public class MyUtil {
-    public final static String URL = "jdbc:mysql://localhost:3306/addressbook";
+    public final static String URL = "jdbc:mysql://localhost:3306/addressbook?autoReconnect=true&useSSL=false";
     public final static String LOGIN = "root";
     public final static String PASSWORD = "root";
     private static Integer nextUserID = 1;
