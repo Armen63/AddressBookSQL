@@ -92,7 +92,7 @@ public class Controller {
             comman = input.nextLine();
         }
 
-    private void changeUserInfo() throws MyException {
+    private void changeUserInfo() throws MyException, SQLException {
         UserRepositoryImpl userimpl = new UserRepositoryImpl();
         printMessage("writeID");
         Integer id;
@@ -139,7 +139,7 @@ public class Controller {
     }
 
 
-    private void signIn(String username,String password)throws MyException {
+    private void signIn(String username,String password) throws MyException, SQLException {
         User user = new User();
         Scanner input = new Scanner(System.in);
         String name;
@@ -175,7 +175,7 @@ public class Controller {
         } else
             System.exit(444);
     }
-    private void addTelNumber()throws MyException {                                                  // ----------------ADD
+    private void addTelNumber() throws MyException, SQLException {                                                  // ----------------ADD
         TelNumber telNumber = new TelNumber();
         Scanner input = new Scanner(System.in);
        printMessage("writeTelNumber");
@@ -249,12 +249,12 @@ public class Controller {
         else
             System.exit(4);
     }
-    private  void showUserList() throws MyException {                                                       //------------SHOW
+    private  void showUserList() throws MyException, SQLException {                                                       //------------SHOW
         UserRepositoryImpl usImpl = new UserRepositoryImpl();
         usImpl.getUser(null);
     }
 
-    private void showTelNumbers() throws MyException {
+    private void showTelNumbers() throws MyException, SQLException {
         NumberRepositoryImpl numImpl = new NumberRepositoryImpl();
         printMessage("writeID");
         Integer id;
@@ -283,38 +283,40 @@ public class Controller {
             e.printStackTrace();
         }
     }
-    private void deleteUser() throws MyException,SQLException {                                                        // ----------------DELETE
+    private void deleteUser() throws MyException,SQLException {                                 // ----------------DELETE
         UserRepositoryImpl userImpl = new UserRepositoryImpl();
         printMessage("deleteUser");
         Integer id = input.nextInt();
         userImpl.deleteUser(id);
     }
 
-    private void deleteFriend() {
-        try{
+    private void deleteFriend() throws SQLException {
+        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+        Statement statement = (Statement) connection.createStatement();
+        ResultSet resultSet = null;
+        try {
             Scanner input = new Scanner(System.in);
             String friendname;
             printMessage("deleteFriend");
             friendname = input.nextLine();
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            String sql = "DELETE FROM addressbook.friendlist where FriendName = '" + friendname + "'" ;
+            String sql = "DELETE FROM addressbook.friendlist where FriendName = '" + friendname + "'";
             statement.executeUpdate(sql);
             sql = "select * from addressbook.friendlist";
-            ResultSet resultSet = statement.executeQuery(sql);
             System.out.println("•••••••••After deleting•••••••••");
-            while(resultSet.next()) {
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
                 int friendID = resultSet.getInt("id");
                 String friendName = resultSet.getString("FriendName");
                 System.out.print("ID: [" + friendID + "]");
                 System.out.println(" FriendName: [" + friendName + "]");
             }
-            connection.close();
-            statement.close();
-            resultSet.close();
             System.exit(404);
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            connection.close();
+            statement.close();
+            resultSet.close();
         }
     }
     private void deleteTelNumber() {

@@ -18,23 +18,37 @@ import static am.aca.AddressBook.comman.util.MyUtil.URL;
  * Created by Armen on 9/12/2016.
  */
 public class NumberRepositoryImpl implements NumberRepository {
+    private static NumberRepositoryImpl instance;
+    public NumberRepositoryImpl(){
+
+    }
+    public static NumberRepositoryImpl getInstance(){
+        if(instance==null){
+            instance=new NumberRepositoryImpl();
+        }
+        return instance;
+    }
+
+
     @Override
-    public void getTelNumbers(Integer id) throws MyException {
+    public void getTelNumbers(Integer id) throws MyException, SQLException {
+        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+        Statement statement = (Statement) connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from addressbook.telnumber where id = " + id);
+
         try {
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from addressbook.telnumber where id = " + id);
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 int telNumberId = resultSet.getInt("id");
                 String homeNumber = resultSet.getString("HomeNumber");
                 String mobileNumber = resultSet.getString("MobileNumber");
                 System.out.println("id = " + telNumberId + " HomeNumber = " + homeNumber + " MobileNumber " + mobileNumber);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             connection.close();
             statement.close();
             resultSet.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }

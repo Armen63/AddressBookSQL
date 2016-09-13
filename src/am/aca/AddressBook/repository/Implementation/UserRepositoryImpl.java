@@ -20,13 +20,24 @@ import static am.aca.AddressBook.comman.util.MyUtil.*;
  * Created by Armen on 9/11/2016.
  */
 public class UserRepositoryImpl implements UserRepository {
+    private static UserRepositoryImpl instance;
+    public UserRepositoryImpl(){
+
+    }
+    public static UserRepositoryImpl getInstance(){
+        if(instance==null){
+        }
+            instance=new UserRepositoryImpl();
+        return instance;
+    }
+
     @Override
     public User addUser(User user) throws MyException {
         return null;
     }
 
     @Override
-    public void editUser(Integer id) throws MyException {
+    public void editUser(Integer id) throws MyException, SQLException {
         Scanner input = new Scanner(System.in);
         String username,
                 password;
@@ -34,56 +45,61 @@ public class UserRepositoryImpl implements UserRepository {
         username = input.nextLine();
         printMessage("writePassword");
         password = input.nextLine();
+        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+        Statement statement = (Statement) connection.createStatement();
+
+        String update = ("UPDATE user SET Username = '" + username + "', Password = '" + password + "' where id =" + id);
+        ResultSet resultSet = null;
         try {
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            String update =  ("UPDATE user SET Username = '"+ username + "', Password = '" + password +"' where id =" + id);
-            ResultSet resultSet = statement.executeQuery(update);
-            while(resultSet.next()) {
+            resultSet = statement.executeQuery(update);
+            while (resultSet.next()) {
                 int userID = resultSet.getInt("id");
                 username = resultSet.getString("Username");
                 password = resultSet.getString("Password");
                 System.out.println("id = " + userID + " Username = " + username + " Password " + password);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             connection.close();
             statement.close();
             resultSet.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
     @Override
-    public void deleteUser(Integer id) throws MyException {/// etam gam esi dzemmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+    public void deleteUser(Integer id) throws MyException, SQLException {
+        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+        Statement statement = (Statement) connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from addressbook.user where id = " + id);
         try {
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from addressbook.user where id = " + id);
             while(resultSet.next()) {
                 int userID = resultSet.getInt("id");
                 String username = resultSet.getString("Username");
                 String password = resultSet.getString("Password");
                 System.out.println("id = " + userID + " Username = " + username + " Password " + password);
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
             connection.close();
             statement.close();
             resultSet.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
     }
 
     @Override
-    public void getUser(Integer id) throws MyException {
+    public void getUser(Integer id) throws MyException, SQLException {
         Scanner input = new Scanner(System.in);
         String comman;
         id = input.nextInt();
+        Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
+        Statement statement = (Statement) connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from addressbook.user where id = " + id );
         try {
-            Connection connection = DriverManager.getConnection(URL, PASSWORD, LOGIN);
-            Statement statement = (Statement) connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from addressbook.user where id = " + id );
-
             while (resultSet.next()) {
                 System.out.print(resultSet.getString(1) + " ");
                 System.out.print(resultSet.getString(2) + " ");
@@ -91,11 +107,14 @@ public class UserRepositoryImpl implements UserRepository {
                 System.out.print("\n");
 
             }
-            connection.close();
-            statement.close();
-            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        finally {
+            connection.close();
+            statement.close();
+            resultSet.close();
+        }
     }
+
 }
